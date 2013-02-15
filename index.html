@@ -18,39 +18,107 @@
     <div class="wrapper">
       <header>
         <h1>OpenAquaponics Software Portal</h1>
-        <p>For all of you aquaponics software needs</p>
+        <p>For all of your aquaponics software needs</p>
         <p class="view"><a href="https://github.com/OpenAquaponics">View the Project on GitHub <small>OpenAquaponics</small></a></p>
         <ul>
           <li class="single"><a href="">View On <strong>GitHub</strong></a></li>
         </ul>
       </header>
       <section>
-        <h3>Welcome to GitHub Pages.</h3>
+        <h3>Introduction</h3>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+<p>For those who are not familiar with setting up hardware and software systems, don't worry.  I'll try my best to keep everything as stright forward and simple as possible.</p>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
+<p>The following are greate reference instructions in case I missed a step or if something doesn’t work as listed:
+<a href="http://www.raspberrypi.org/downloads">http://www.raspberrypi.org/downloads</a>
+<a href="http://elinux.org/RPi_Easy_SD_Card_Setup">http://elinux.org/RPi_Easy_SD_Card_Setup</a>
+<a href="http://www.penguintutor.com/linux/raspberrypi-webserver">http://www.penguintutor.com/linux/raspberrypi-webserver</a></p>
+
+<p>This how-to is going to show you how to setup your Raspberry Pi to host both the OAServer and OANode applications.  This first iteration is going to assume you are running both applications on the same device.  There is nothing stopping you from hosting OAServer on another Linux machine, but for the purposes of this how-to, I will assume you want to run everything on one device.  Eventually there will be a "cloud" instance of OAServer, and you won't need to worry about hosting that software unless you would like to run a local system.  So onward!!</p>
+
+<h3>What you need</h3>
+
+<p>To get started you will need:</p>
+
+<ul>
+<li>Computer with SD card reader</li>
+<li>Raspberry Pi</li>
+<li>SD card (4GB or more)</li>
+<li>Ethernet cable (for the initial setup)</li>
+<li>Monitor (requires HDMI)</li>
+<li>Keyboard</li>
+</ul><h3>Download and Install Raspbian</h3>
+
+<p>So we begin the tutorial by downloading and installing the Raspberry Pi image.  The following website has great step-by-step instructions on how to do this.
+<a href="http://elinux.org/RPi_Easy_SD_Card_Setup#Copying_the_image_to_an_SD_card_on_Windows">http://elinux.org/RPi_Easy_SD_Card_Setup#Copying_the_image_to_an_SD_card_on_Windows</a></p>
+
+<p>Unplug the SD card from your machine and place it in the Raspberry Pi.  Go ahead and plug in a monitor, keyboard, and power supply.</p>
+
+<p>On first boot execute the following:</p>
+
+<p>sudo raspi-config</p>
+
+<p>, enable ssh</p>
+
+<p>run sudo raspi-config</p>
+
+<p>execute update
+optional execute enable boot_behaviour
+optional execute expand_rootfs  (depending on SD card size, this can take a long time)</p>
+
+<p>Finish and reboot</p>
+
+<p>While waiting for "Online re-size"</p>
+
+<p>use your router to get IP address of device
+putty ip of your device</p>
+
+<p>Optional If you really want to latest run: sudo apt-get upgrade</p>
+
+<h3>Install Developer Packages</h3>
+
+<p>Install a command line text editor of your choice.  There are a multitude of options, choose whichever you prefer.  If you are not sure, <strong>nano</strong> is an easy one to use.</p>
+
+<pre><code>sudo apt-get install vim
+sudo apt-get install nano
+sudo apt-get install emacs
 </code></pre>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<p>Go ahead and make sure these applications are installed.  NTP syncs the system clock and CURL allows you send HTTP messages from the command line.</p>
 
-<h3>Designer Templates</h3>
+<pre><code>sudo apt-get install curl ntp
+</code></pre>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+<p>Now of course you are going to need the GIT client, so go ahead and install it.</p>
 
-<h3>Rather Drive Stick?</h3>
+<pre><code>sudo apt-get install git
+</code></pre>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+<h3>Install Optional Packages</h3>
 
-<h3>Authors and Contributors</h3>
+<p>The following packages are optional and are handy to have installed on the system.  </p>
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<pre><code>sudo apt-get install locate
+sudo apt-get install ack
+</code></pre>
 
-<h3>Support or Contact</h3>
+<h6># Move these to OAServer</h6>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+<h3>Install LAMP Packages</h3>
+
+<p>This will setup the RPi to have a webserver and database running.  OAServer requires this in order to run
+Install the Apache server</p>
+
+<pre><code>sudo apt-get install mysql-server
+sudo apt-get install apache2
+sudo apt-get install php5 php5-mysql php5-curl
+sudo apt-get install phpmyadmin
+  &lt; Follow the on screen instructions for passwords, you will need MYSQL_PASSWD &gt;
+</code></pre>
+
+<p>
+NOTE: You may run into problems during the installation of mysql if you SD card is too small.  I'd recommend at least a 8GB SD card.  <a href="http://databaseblog.myname.nl/2013/01/how-to-install-mysql-succesfully-on.html">http://databaseblog.myname.nl/2013/01/how-to-install-mysql-succesfully-on.html</a>
+NOTE: Go get a drink.  This can take a while.  </p>
       </section>
     </div>
     <footer>
